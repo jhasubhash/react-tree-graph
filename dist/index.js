@@ -418,6 +418,7 @@
 
 	var propTypes$2 = {
 		children: PropTypes.node,
+		partner: PropTypes.node,
 		height: PropTypes.number.isRequired,
 		keyProp: PropTypes.string.isRequired,
 		labelProp: PropTypes.string.isRequired,
