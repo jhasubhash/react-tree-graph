@@ -56,14 +56,24 @@ const defaultProps = {
 
 export default class Tree extends React.PureComponent {
 
-	childCount(level, n, levelWidth) {
+	childCountB(level, n, levelWidth) {
 		if (n.children && n.children.length > 0) {
 			if(levelWidth.length <= level + 1) levelWidth.push(0);
 			levelWidth[level + 1] += n.children.length;
 			n.children.forEach(d => {
-				this.childCount(level + 1, d, levelWidth);
+				this.childCountB(level + 1, d, levelWidth);
 			});
 		}
+	}
+
+	childCountD(n, levelDepth) {
+		let res = levelDepth;
+		if (n.children && n.children.length > 0) {
+			n.children.forEach(d => {
+				res = Math.max(res, this.childCountD(d, levelDepth + 1));
+			});
+		}
+		return res;
 	}
 
 	render() {
@@ -75,9 +85,11 @@ export default class Tree extends React.PureComponent {
 		let root = tree().size([contentHeight, contentWidth])(data);
 		//TO DO : optimize
 		let levelWidth = [1];
-		this.childCount(0, root, levelWidth);
+		this.childCountB(0, root, levelWidth);
 		let newHeight = Math.max(...levelWidth) * 70; // 70 pixels per line
-		root = tree().size([newHeight, contentWidth])(data);
+		let levelDepth = this.childCountD(root, 1);
+		let newWidth = levelDepth * 120; // 120 pixels per line
+		root = tree().size([Math.max(newHeight, contentHeight), Math.max(newWidth, 0)])(data);
 		let nodes = root.descendants();
 		let links = root.links();
 

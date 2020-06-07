@@ -317,6 +317,7 @@
 		labelProp: PropTypes.string.isRequired,
 		shape: PropTypes.string.isRequired,
 		nodeProps: PropTypes.object.isRequired,
+		partner: PropTypes.object,
 		gProps: PropTypes.object.isRequired,
 		textProps: PropTypes.object.isRequired
 	};
@@ -398,14 +399,34 @@
 						React.createElement(this.props.shape, wrappedNodeProps),
 						React.createElement(
 							'text',
-							_extends(
-								{
-									dx: offset + 0.5,
-									dy: 5
-								},
-								wrappedTextProps
-							),
-							this.props[this.props.labelProp]
+							_extends({}, wrappedTextProps, {
+								dx: offset + 0.5
+							}),
+							!this.props.partner &&
+								React.createElement(
+									'tspan',
+									{
+										dy: offset
+									},
+									this.props[this.props.labelProp]
+								),
+							this.props.partner &&
+								React.createElement(
+									'tspan',
+									{
+										dy: -offset
+									},
+									this.props[this.props.labelProp]
+								),
+							this.props.partner &&
+								React.createElement(
+									'tspan',
+									{
+										x: offset + 0.5,
+										dy: offset * 2.5
+									},
+									this.props.partner.name
+								)
 						)
 					);
 				}
@@ -952,23 +973,39 @@
 
 		_createClass(Tree, [
 			{
-				key: 'childCount',
-				value: function childCount(level, n, levelWidth) {
+				key: 'childCountB',
+				value: function childCountB(level, n, levelWidth) {
 					var _this = this;
 
 					if (n.children && n.children.length > 0) {
 						if (levelWidth.length <= level + 1) levelWidth.push(0);
 						levelWidth[level + 1] += n.children.length;
 						n.children.forEach(function(d) {
-							_this.childCount(level + 1, d, levelWidth);
+							_this.childCountB(level + 1, d, levelWidth);
 						});
 					}
 				}
 			},
 			{
+				key: 'childCountD',
+				value: function childCountD(n, levelDepth) {
+					var _this2 = this;
+
+					var res = levelDepth;
+
+					if (n.children && n.children.length > 0) {
+						n.children.forEach(function(d) {
+							res = Math.max(res, _this2.childCountD(d, levelDepth + 1));
+						});
+					}
+
+					return res;
+				}
+			},
+			{
 				key: 'render',
 				value: function render() {
-					var _this2 = this;
+					var _this3 = this;
 
 					var contentWidth =
 						this.props.width -
@@ -988,14 +1025,21 @@
 					); //TO DO : optimize
 
 					var levelWidth = [1];
-					this.childCount(0, root, levelWidth);
+					this.childCountB(0, root, levelWidth);
 					var newHeight = Math.max.apply(Math, levelWidth) * 70; // 70 pixels per line
 
-					root = d3Hierarchy.tree().size([newHeight, contentWidth])(data);
+					var levelDepth = this.childCountD(root, 1);
+					var newWidth = levelDepth * 120; // 120 pixels per line
+
+					root = d3Hierarchy
+						.tree()
+						.size([Math.max(newHeight, contentHeight), Math.max(newWidth, 0)])(
+						data
+					);
 					var nodes = root.descendants();
 					var links = root.links();
 					nodes.forEach(function(node) {
-						node.y += _this2.props.margins.top;
+						node.y += _this3.props.margins.top;
 					});
 					return React.createElement(
 						Animated,
