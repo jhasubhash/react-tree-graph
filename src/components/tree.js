@@ -55,14 +55,29 @@ const defaultProps = {
 };
 
 export default class Tree extends React.PureComponent {
+
+	childCount(level, n, levelWidth) {
+		if (n.children && n.children.length > 0) {
+			if(levelWidth.length <= level + 1) levelWidth.push(0);
+			levelWidth[level + 1] += n.children.length;
+			n.children.forEach(d => {
+				this.childCount(level + 1, d, levelWidth);
+			});
+		}
+	}
+
 	render() {
 		const contentWidth = this.props.width - this.props.margins.left - this.props.margins.right;
 		const contentHeight = this.props.height - this.props.margins.top - this.props.margins.bottom;
-
 		// data is cloned because d3 will mutate the object passed in
 		let data = hierarchy(clone(this.props.data), this.props.getChildren);
 
 		let root = tree().size([contentHeight, contentWidth])(data);
+		//TO DO : optimize
+		let levelWidth = [1];
+		this.childCount(0, root, levelWidth);
+		let newHeight = Math.max(...levelWidth) * 70; // 70 pixels per line
+		root = tree().size([newHeight, contentWidth])(data);
 		let nodes = root.descendants();
 		let links = root.links();
 

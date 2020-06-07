@@ -952,9 +952,23 @@
 
 		_createClass(Tree, [
 			{
+				key: 'childCount',
+				value: function childCount(level, n, levelWidth) {
+					var _this = this;
+
+					if (n.children && n.children.length > 0) {
+						if (levelWidth.length <= level + 1) levelWidth.push(0);
+						levelWidth[level + 1] += n.children.length;
+						n.children.forEach(function(d) {
+							_this.childCount(level + 1, d, levelWidth);
+						});
+					}
+				}
+			},
+			{
 				key: 'render',
 				value: function render() {
-					var _this = this;
+					var _this2 = this;
 
 					var contentWidth =
 						this.props.width -
@@ -971,11 +985,17 @@
 					);
 					var root = d3Hierarchy.tree().size([contentHeight, contentWidth])(
 						data
-					);
+					); //TO DO : optimize
+
+					var levelWidth = [1];
+					this.childCount(0, root, levelWidth);
+					var newHeight = Math.max.apply(Math, levelWidth) * 70; // 70 pixels per line
+
+					root = d3Hierarchy.tree().size([newHeight, contentWidth])(data);
 					var nodes = root.descendants();
 					var links = root.links();
 					nodes.forEach(function(node) {
-						node.y += _this.props.margins.top;
+						node.y += _this2.props.margins.top;
 					});
 					return React.createElement(
 						Animated,
