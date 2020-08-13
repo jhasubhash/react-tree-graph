@@ -53,9 +53,9 @@ export default class Node extends React.PureComponent {
 			<g {...wrappedGProps} transform={this.getTransform()}>
 				<this.props.shape {...wrappedNodeProps}/>
 				<text {...wrappedTextProps} dx={offset + 0.5}>
-					{!this.props.partner && <tspan dy={offset}>{this.props[this.props.labelProp]}</tspan>}
-					{this.props.partner && <tspan dy={-offset}>{this.props[this.props.labelProp]}</tspan>}
-					{this.props.partner && <tspan x={offset + 0.5} dy={offset * 2.5}>{this.props.partner.name}</tspan>}
+					{(!this.props.partner.name || !this.props.partner.name.length) && <tspan dy={offset}>{this.props[this.props.labelProp]}</tspan>}
+					{this.props.partner.name && this.props.partner.name.length && <tspan dy={-offset}>{this.props[this.props.labelProp]}</tspan>}
+					{this.props.partner.name && this.props.partner.name.length && <tspan x={offset + 0.5} dy={offset * 2.5}>{this.props.partner.name}</tspan>}
 				</text>
 			</g>);
 	}

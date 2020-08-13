@@ -402,7 +402,7 @@
 							_extends({}, wrappedTextProps, {
 								dx: offset + 0.5
 							}),
-							!this.props.partner &&
+							(!this.props.partner.name || !this.props.partner.name.length) &&
 								React.createElement(
 									'tspan',
 									{
@@ -410,7 +410,8 @@
 									},
 									this.props[this.props.labelProp]
 								),
-							this.props.partner &&
+							this.props.partner.name &&
+								this.props.partner.name.length &&
 								React.createElement(
 									'tspan',
 									{
@@ -418,7 +419,8 @@
 									},
 									this.props[this.props.labelProp]
 								),
-							this.props.partner &&
+							this.props.partner.name &&
+								this.props.partner.name.length &&
 								React.createElement(
 									'tspan',
 									{
