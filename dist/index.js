@@ -391,6 +391,7 @@
 						this.props.textProps,
 						this.props[this.props.keyProp]
 					);
+					var fontSize = wrappedTextProps.fontSize;
 					return React.createElement(
 						'g',
 						_extends({}, wrappedGProps, {
@@ -406,7 +407,7 @@
 								React.createElement(
 									'tspan',
 									{
-										dy: offset
+										dy: fontSize / 2.5
 									},
 									this.props[this.props.labelProp]
 								),
@@ -415,7 +416,7 @@
 								React.createElement(
 									'tspan',
 									{
-										dy: -offset
+										dy: -fontSize / 2.5
 									},
 									this.props[this.props.labelProp]
 								),
@@ -425,7 +426,7 @@
 									'tspan',
 									{
 										x: offset + 0.5,
-										dy: offset * 2.5
+										dy: fontSize + 0.5
 									},
 									this.props.partner.name
 								)
